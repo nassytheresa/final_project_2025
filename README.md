@@ -158,6 +158,23 @@ docker compose up --build
 
 ## Usage
 
+```bash
+usage: main.py [-h] [--mode {fetch,etl,dashboard}] [--pages PAGES] [--per-page PER_PAGE] [--delay DELAY] [--days DAYS] [--debug] [--port PORT]
+
+Cryptocurrency Data Pipeline
+
+options:
+  -h, --help            show this help message and exit
+  --mode {fetch,etl,dashboard}
+                        Operation mode
+  --pages PAGES         Number of pages to fetch
+  --per-page PER_PAGE   Items per page to fetch
+  --delay DELAY         Delay between requests
+  --days DAYS           Days of data to process
+  --debug               Run in debug mode
+  --port PORT           Port for dashboard
+```
+
 ### Data Collection and ETL
 
 The application provides two main operations: data fetching and ETL analysis.
@@ -167,9 +184,7 @@ The application provides two main operations: data fetching and ETL analysis.
 Fetch cryptocurrency data from CoinGecko:
 
 ```bash
-python -m app.main fetch
-
-python -m app.main fetch --pages 5 --per-page 50 --delay 2
+python -m app.main --mode fetch --pages 5 --per-page 50 --delay 2
 ```
 
 Options:
@@ -182,27 +197,11 @@ Options:
 Run the ETL pipeline for data analysis:
 
 ```bash
-python -m app.main etl
-
-python -m app.main etl --days 7 --no-json
+python -m app.main --mode etl --days 1
 ```
 
 Options:
 - `--days`: Number of days of historical data to analyze (default: 1)
-- `--no-json`: Disable JSON export of analysis results
-
-### Workflow Orchestration
-
-The ETL pipeline is automated using Apache Airflow:
-
-1. Start Airflow:
-```bash
-docker-compose up airflow-webserver airflow-scheduler
-```
-
-2. Access Airflow UI at http://localhost:8080
-3. Enable the `crypto_pipeline` DAG
-4. Monitor pipeline execution and logs
 
 ### Data Visualization
 
@@ -210,10 +209,10 @@ Access the visualization dashboard:
 
 1. Start the visualization server:
 ```bash
-python -m app.visualization.dashboards
+python -m app.main --mode dashboard --debug --port 8080
 ```
 
-2. Open http://localhost:8050 in your browser
+2. Open http://localhost:8080 in your browser
 
 ## Output
 
@@ -224,12 +223,7 @@ The ETL pipeline generates analysis results in multiple formats:
    - Each analysis run is timestamped
    - Historical analysis data is preserved
 
-2. JSON Export (optional):
-   - Results are saved in the `output` directory
-   - Filename format: `crypto_analysis_YYYYMMDD_HHMMSS.json`
-   - Contains all analysis metrics and statistics
-
-3. Visualization Dashboard:
+2. Visualization Dashboard:
    - Interactive charts and graphs
    - Real-time data updates
    - Customizable views and filters
