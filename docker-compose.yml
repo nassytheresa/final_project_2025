@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mongo:
+    container_name: tempress-mongo
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=crypto_db
+    restart: always
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tempress-app
+    depends_on:
+      - mongo
+    environment:
+      - DATABASE_NAME=crypto_db
+      - COLLECTION_NAME=market_data
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+    restart: always
+    command: python -m app.main --mode dashboard --port 8080
+
+volumes:
+  mongodb_data: 
